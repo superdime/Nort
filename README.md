@@ -7,3 +7,6 @@ This is mainly used to help me learn how design influences coding. Overall, I ho
 ## Structure
 - Design Folder - Holds Design information such as diagrams and decisions.
 - Game Folder - Holds the game.
+
+## Play Game
+[Play Game](http://htmlpreview.github.io/?https://github.com/superdime/Nort/blob/master/Game/index.html)
