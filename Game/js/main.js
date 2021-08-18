@@ -1,37 +1,43 @@
 class Game{
-    constructor(element, width, height, playerCount){                   //Early Development - needs to be fixed according to diagram
-        this.canvas = element;
+    //Controls flow of game
+    constructor(canvas, width, height, playerCount){                   //Early Development - needs to be fixed according to diagram
+        this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
         this.width = width;
         this.height = height;
-        this.canvas.width = width;
-        this.canvas.height = height;
+        this.canvas.width = width;          //canvas setup
+        this.canvas.height = height;        //canvas setup
         this.players = [];
         this.alive = [];
         this.grid = new Grid(width, height, playerCount);
-        this.state = 0; //0 = Countdown, 1 = inGame, 2 = Winner Message (Reset)
-        this.counter = 0;
+        //Need to set spawns !!!!
+        this.state = 0;     //0 = Countdown, 1 = inGame, 2 = Winner Message (Reset)
+        this.counter = 0;   //Used for time-based rendering
     }
 
     Clear(){
+        //Clears Screen
         this.ctx.fillStyle = "#FFFFFF";
         this.ctx.fillRect(0,0, this.width, this.height);
     }
 
     AddPlayer(player){
+        //Adds player to existing players
         this.players.push(player);
         this.alive.push(player);
     }
 
+    //Add ResetPlayers()
+
     Tick(){
+        //Updates current state to next frame
         switch (this.state){
-            case 0:     //Countdown
+            case 0:             //Countdown Phase
                 this.counter++;
                 this.Clear();
                 //Draw Living player (if exists)
-                
                 for (let i of this.alive){
-                    this.Draw(i.position.x, i.position.y, i.color);
+                    this.DrawPixel(i.position.x, i.position.y, i.color);
                 }
 
                 //Draw Map
@@ -40,17 +46,17 @@ class Game{
                         let currentTile = this.grid.GetTile(i, j);
                         switch(currentTile){
                             case TileTypes.Barrier:
-                                this.Draw(i, j, "#000000");
+                                this.DrawPixel(i, j, "#000000");
                                 break;
                             case TileTypes.Line1:
-                                this.Draw(i, j, "#FF0000");
+                                this.DrawPixel(i, j, "#FF0000");
                                 break;
                             case TileTypes.Line2:
-                                this.Draw(i, j, "#00FF00");
+                                this.DrawPixel(i, j, "#00FF00");
                         }
                     }
                 }
-                
+
                 //Draw CountDown
                 this.ctx.fillStyle = "#000000";
                 if (this.counter < 15){
@@ -67,28 +73,29 @@ class Game{
                     console.log("Fight");
                 }
                 break;
-            case 1:     //inGame
-                this.Clear();   //Reset CTX
-                let remove = [];
-                for (let i of this.alive){      //
+
+            case 1:                     //inGame Phase
+                this.Clear();               //Reset CTX
+                let remove = [];            //Temp variable to hold crashed players
+                //Handle player movement
+                for (let i of this.alive){
                     let oldPos = i.GetPos();
-                    this.grid.SetTile(oldPos.x, oldPos.y, i.controllerState.id);
+                    this.grid.SetTile(oldPos.x, oldPos.y, i.controllerState.id);    //i.controllerState.id needs fix (use name w/ struct) !!!!!!!
                     let newPos = i.Move();
                     let currentTile = this.grid.GetTile(newPos.x, newPos.y);
                     if (currentTile != 0){
+                        //Checks if player is on crashable tile
                         i.Crash();
                         remove.push(i);
                     }
-                    this.ctx.fillStyle = i.color;
-                    this.ctx.fillRect(i.position.x, i.position.y, 1, 1);
+                    //Draw player to screen
+                    this.DrawPixel(i.position.x, i.position.y, i.color);
                 }
 
                 //Check Collision
                 for (let a of this.alive){
-                    let posA = a.GetPos();
                     for (let b of this.alive){
-                        let posB = b.GetPos();
-                        if (a != b && posA.x == posB.x && posA.y == posB.y){
+                        if (a != b && a.position.x == b.position.x && a.position.y == b.position.y){    //Checks each player by player comparison
                             if (remove.indexOf(a) == -1){
                                 remove.push(a);
                             }
@@ -108,13 +115,13 @@ class Game{
                         let currentTile = this.grid.GetTile(i, j);
                         switch(currentTile){
                             case TileTypes.Barrier:
-                                this.Draw(i, j, "#000000");
+                                this.DrawPixel(i, j, "#000000");
                                 break;
                             case TileTypes.Line1:
-                                this.Draw(i, j, "#FF0000");
+                                this.DrawPixel(i, j, "#FF0000");
                                 break;
                             case TileTypes.Line2:
-                                this.Draw(i, j, "#00FF00");
+                                this.DrawPixel(i, j, "#00FF00");
                         }
                     }
                 }
@@ -122,32 +129,29 @@ class Game{
                 //Check for End Game
                 if (this.alive.length < 2){
                     this.EndGame();
-                    this.state = 2;
-                    this.counter = 0;
                 }
                 break;
 
             case 2:
                 this.Clear();
                 //Draw Living player (if exists)
-                
                 for (let i of this.alive){
-                    this.Draw(i.position.x, i.position.y, i.color);
+                    this.DrawPixel(i.position.x, i.position.y, i.color);
                 }
 
                 //Draw Map
                 for (let i = 0; i < this.grid.width; i++){
                     for (let j = 0; j < this.grid.height; j++){
                         let currentTile = this.grid.GetTile(i, j);
-                        switch(currentTile){
+                        switch(currentTile){                            //Could use better implementation -> color is stored within TileTypes instead of numbers !!!!!!
                             case TileTypes.Barrier:
-                                this.Draw(i, j, "#000000");
+                                this.DrawPixel(i, j, "#000000");
                                 break;
                             case TileTypes.Line1:
-                                this.Draw(i, j, "#FF0000");
+                                this.DrawPixel(i, j, "#FF0000");
                                 break;
                             case TileTypes.Line2:
-                                this.Draw(i, j, "#00FF00");
+                                this.DrawPixel(i, j, "#00FF00");
                         }
                     }
                 }
@@ -173,12 +177,15 @@ class Game{
         
     }
 
-    Draw(x, y, color){
+    DrawPixel(x, y, color){
+        //Draws single pixel given location and color
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x, y, 1, 1);
     }
 
     EndGame(){
+        //Sets Game into a End Game state (also logs it to console)
+        this.state = 2;
         if (this.alive.length == 1){
             console.log(this.alive[0].name + " Wins!");
         }else{
@@ -187,24 +194,26 @@ class Game{
     }
 
     Reset(){
+        //Resets game
         this.state = 0;
         this.counter = 0;
         this.alive = [];
         for (let i of this.players){
             this.alive.push(i);
-            i.Resurrect();
+            i.Resurrect();                  //May not need Resurrect and Crash for Player (information already stored in Game.alive[]) !!!!! 
         }
         this.grid.Clear();
-        this.players[0].SetPositionDirection(new Point(5, 5), Direction.down);
+        this.players[0].SetPositionDirection(new Point(5, 5), Direction.down);  //Need to Fix Spawns !!!!
         this.players[1].SetPositionDirection(new Point(44, 44), Direction.up);
     }
 }
 
 class Player{
+    //Controls movement
     constructor(controllerState, name, id, pos, dir, color){
         this.controllerState = controllerState;
-        this.name = name;
-        this.id = id;
+        this.name = name;       //Actual player name
+        this.id = id;           //Used for searches -- Not necessary -- FIX !!!!
         this.position = pos;
         this.direction = dir;   //0 = up, 1 = down, 2 = left, 3 = right -- See Direction enum
         this.color = color;
@@ -212,35 +221,38 @@ class Player{
     }
 
     Move(){
+        //Changes player location based on direction and ControllerState
         if (this.alive){
-            //Get Current
+            //Get current ControllerState
             this.controllerState.Poll();
+
             //Change direction
-            if (this.controllerState.buttons[0] && this.direction != Direction.down){
-                this.direction = 0;
+            if (this.controllerState.buttons[Direction.up] && this.direction != Direction.down){    //Want up, can't be going down
+                this.direction = Direction.up;
             }
-            else if (this.controllerState.buttons[1] && this.direction != Direction.up){
-                this.direction = 1;
+            else if (this.controllerState.buttons[Direction.down] && this.direction != Direction.up){            //Want down, can't be going uo
+                this.direction = Direction.down;
             }
-            else if (this.controllerState.buttons[2] && this.direction != Direction.right){
-                this.direction = 2;
+            else if (this.controllerState.buttons[Direction.left] && this.direction != Direction.right){         //Want left, can't be going right
+                this.direction = Direction.left;
             }
-            else if (this.controllerState.buttons[3] && this.direction != Direction.left){
-                this.direction = 3;
+            else if (this.controllerState.buttons[Direction.right] && this.direction != Direction.left){          //Want right, can't be going left
+                this.direction = Direction.right;
             }
+
             //Update position
             switch (this.direction){
-                case 0: //Up
-                    this.position.y--;
+                case Direction.up:
+                    this.position.y--;  //Go up 1 - note y is inverted in this case
                     break;
-                case 1: // Down
-                    this.position.y++;
+                case Direction.down:
+                    this.position.y++;  //Go down 1
                     break;
-                case 2:
-                    this.position.x--;
+                case Direction.left:
+                    this.position.x--;  //Go left 1
                     break;
-                case 3:
-                    this.position.x++;
+                case Direction.right:
+                    this.position.x++;  //Go right 1
                     break;
             }
         }
@@ -248,26 +260,32 @@ class Player{
     }
 
     Crash(){
+        //Not necessary -- FIX !!!!
         this.alive = false;
     }
 
     Resurrect(){
+        //Not necessary -- FIX !!!!
         this.alive = true;
     }
 
     GetPos(){
+        //Not necessary since position is public -- FIX !!!!
         return this.position;
     }
 
     GetColor(){
+        //Not necessary since color is public -- FIX !!!!
         return this.color;
     }
 
     Reset(pos){
+        //Resets position
         this.pos = pos;
     }
 
     GetPause(){
+        //Checks if pause is pressed (for reset) -- may not be necessary -- FIX !!!!
         if (this.controllerState.buttons[4]){
             return true;
         }
@@ -275,12 +293,14 @@ class Player{
     }
 
     SetPositionDirection(pos, dir){
+        //Quick position and direction set
         this.position = pos;
         this.direction = dir;
     }
 }
 
 class ControllerState{
+    //Holds important information about certain keys on a keyboard
     constructor(keyboardState, id, up, down, left, right, pause){
         this.keyboardState = keyboardState;
         this.id = id;
@@ -290,14 +310,18 @@ class ControllerState{
     }
 
     Poll(){
+        //Requests important button data from KeyboardState
         this.buttons = this.keyboardState.retrieveData(this.id);
     }
+
+    //Add ChangeButtons method -- FIX !!!!
 }
 
 class KeyboardState{
+    //Interfaces with hardware keyboard. Given certain keys, it will track those keys' changes
     constructor(){
         this.data = [];
-        document.addEventListener("keydown", event =>{
+        document.addEventListener("keydown", event =>{      //When key is pressed
             for (let i = 0; i < this.data.length; i++){
                 for (let j = 0; j < this.data[i].keys.length; j++){
                     if (event.which == this.data[i].keys[j]){
@@ -307,7 +331,7 @@ class KeyboardState{
                 }
             }
         });
-        document.addEventListener("keyup", event=>{
+        document.addEventListener("keyup", event=>{         //When key is released
             for (let i = 0; i < this.data.length; i++){
                 for (let j = 0; j < this.data[i].keys.length; j++){
                     if (event.which == this.data[i].keys[j]){
@@ -320,10 +344,12 @@ class KeyboardState{
     }
 
     addData(data){
+        //Adds key data to data array
         this.data.push(data);
     }
 
     removeData(data){
+        //Removes key data from data array
         let toDel = -1;
         for (let i = 0; i < this.data.length; i++){
             if (data.id == this.data[i].id){
@@ -337,36 +363,44 @@ class KeyboardState{
     }
 
     retrieveData(id){
+        //Gives current key states
         for (let i = 0; i < this.data.length; i++){
             if (id == this.data[i].id){
                 return this.data[i].current;
             }
         }
     }
+
+    //Add resetData()
 }
 
 class Grid{
+    //Holds tile data for game in a 2D array
     constructor(width, height, numplayers){
         this.width = width;
         this.height = height;
         this.tiles = [];
         this.spawns = [];
-        for (let i = 0; i < width; i++){    //Create Empty Tile Array
+        //Create tile array
+        for (let i = 0; i < width; i++){
             let ar = [];
             for (let j = 0; j < height; j++){
                 ar.push(new Tile());
-                if (i == 0 || j == 0 || i == width-1 || j == height-1){
+                if (i == 0 || j == 0 || i == width-1 || j == height-1){     //If a barrier - set to be a barrier tile
                     ar[j].SetTile(TileTypes.Barrier);
                 }
             }
             this.tiles.push(ar);
-        }       
-        for (let i = 0; i < numplayers; i++){       //Create Spawns
+        }
+        
+        //Create spawns
+        for (let i = 0; i < numplayers; i++){   //FIX !!!!
             this.spawns.push(new Point(0,0));
         }
     }
 
     GetTile(x, y){
+        //Given x and y, gives tile. If out of range -> returns -1
         if (x >= 0 && x <= this.width && y >= 0 && y <= this.height){
             return this.tiles[x][y].type;
         }
@@ -374,18 +408,20 @@ class Grid{
     }
 
     SetTile(x, y, type){
+        //Given x, y, and type, sets a tile to that type
         if (x >= 0 && x <= this.width && y >= 0 && y <= this.height){
             this.tiles[x][y].type = type;
         }
     }
 
     Clear(){
+        //Resets map data
         for (let i = 0; i < this.width; i++){
             for (let j = 0; j < this.height; j++){
-                if (i == 0 || j == 0 || i == this.width-1 || j == this.height-1){
+                if (i == 0 || j == 0 || i == this.width-1 || j == this.height-1){   //If a barrier - set to be a barrier tile
                     this.tiles[i][j].type = TileTypes.Barrier;
                 }else{
-                    this.tiles[i][j].type = TileTypes.Empty;
+                    this.tiles[i][j].type = TileTypes.Empty;                        //Else - set to be an empty tile
                 }
                 
             }
@@ -393,43 +429,48 @@ class Grid{
     }
 
     RandomPoint(){
+        //Not implemented -- fix !!!!
         return new Point(Math.floor(Math.random() * (this.width-4)) + 2, Math.random() * (this.height-4) + 2);
     }
 }
 
 class Tile{
+    //Data that holds tile information
     constructor(){
         this.type = TileTypes.Empty;
     }
 
     Clear(){
+        //Sets tile to clear
         this.type = TileTypes.Empty;
     }
 
     GetTile(){
+        //Returns tile type
         return this.type;
     }
 
     SetTile(tileType){
+        //Sets tile to given type
         this.type = tileType;
     }
 }
 
-const TileTypes = {
+const TileTypes = {     //Enum to hold types of tiles
     "Empty": 0,
     "Barrier": 1,
     "Line1": 2,
     "Line2": 3
 }
 
-const Direction = {
+const Direction = {     //Enum to hold direction information
     "up":0,
     "down":1,
     "left":2,
     "right":3
 }
 
-const KeyCode = {
+const KeyCode = {       //Enum to hold keycode and key associations (make bigger later - FIX !)
     "a":65,
     "b":66,
     "c":67,
@@ -465,6 +506,7 @@ const KeyCode = {
 }
 
 class Point{
+    //Data structure to hold 2D coordinate
     constructor(x, y){
         this.x = x;
         this.y = y;
@@ -472,6 +514,7 @@ class Point{
 }
 
 class Triple{
+    //Data structure to hold KeyboardState information
     constructor(id, keys, current = [false, false, false, false, false]){
         this.id = id;
         this.keys = keys;
@@ -480,6 +523,8 @@ class Triple{
 }
 
 function Setup(){
+    //Simple set up function (To be changed when GameSettings interface is implemented)
+    //Just makes a simple 2 player game
     console.log("Starting up...");
     let game = new Game(document.getElementById("canvas"), 50, 50, 2);
     game.Clear();
@@ -499,4 +544,5 @@ function Setup(){
     game.grid.SetTile(1, 0, TileTypes.Barrier);
 }
 
+//Event listener to start on page loaded (main function)
 document.addEventListener("DOMContentLoaded", Setup);
