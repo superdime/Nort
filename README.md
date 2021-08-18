@@ -14,4 +14,4 @@ This is mainly used to help me learn how design influences coding. Overall, I ho
 ### How to Play (Current)
 Player 1 (Red) has WASD input
 Player 2 (Green) has Arrow key input
-Refresh page to play again (NEEDS FIX)
+Press Shift/Enter to refresh
