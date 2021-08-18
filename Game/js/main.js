@@ -1,39 +1,210 @@
 class Game{
-    constructor(element){                   //Early Development - needs to be fixed according to diagram
-        //this.img = new Image(1, 1);
-        //this.img.src = "./a.png";
+    constructor(element, width, height, playerCount){                   //Early Development - needs to be fixed according to diagram
         this.canvas = element;
         this.ctx = this.canvas.getContext("2d");
-        //dthis.ctx.imageSmoothingEnabled = false;
-        this.canvas.width = 100;
-        this.canvas.height = 100;
+        this.width = width;
+        this.height = height;
+        this.canvas.width = width;
+        this.canvas.height = height;
         this.players = [];
+        this.alive = [];
+        this.grid = new Grid(width, height, playerCount);
+        this.state = 0; //0 = Countdown, 1 = inGame, 2 = Winner Message (Reset)
+        this.counter = 0;
     }
 
     Clear(){
         this.ctx.fillStyle = "#FFFFFF";
-        this.ctx.fillRect(0,0, 100, 100);
+        this.ctx.fillRect(0,0, this.width, this.height);
     }
 
     AddPlayer(player){
         this.players.push(player);
+        this.alive.push(player);
     }
 
     Tick(){
-        this.Clear();
-        for (let i of this.players){
-            i.Move();
-            this.ctx.fillStyle = i.color;
-            //this.ctx.drawImage(this.img, i.position.x, i.position.y);
-            this.ctx.fillRect(i.position.x, i.position.y, 1, 1);
+        switch (this.state){
+            case 0:     //Countdown
+                this.counter++;
+                this.Clear();
+                //Draw Living player (if exists)
+                
+                for (let i of this.alive){
+                    this.Draw(i.position.x, i.position.y, i.color);
+                }
+
+                //Draw Map
+                for (let i = 0; i < this.grid.width; i++){
+                    for (let j = 0; j < this.grid.height; j++){
+                        let currentTile = this.grid.GetTile(i, j);
+                        switch(currentTile){
+                            case TileTypes.Barrier:
+                                this.Draw(i, j, "#000000");
+                                break;
+                            case TileTypes.Line1:
+                                this.Draw(i, j, "#FF0000");
+                                break;
+                            case TileTypes.Line2:
+                                this.Draw(i, j, "#00FF00");
+                        }
+                    }
+                }
+                
+                //Draw CountDown
+                this.ctx.fillStyle = "#000000";
+                if (this.counter < 15){
+                    this.ctx.fillText("3", 10, 10, 10);
+                }
+                else if (this.counter < 30){
+                    this.ctx.fillText("2", 10, 10, 10);
+                }
+                else if (this.counter < 45){
+                    this.ctx.fillText("1", 10, 10, 10);
+                }
+                else{
+                    this.state = 1;
+                    console.log("Fight");
+                }
+                break;
+            case 1:     //inGame
+                this.Clear();   //Reset CTX
+                let remove = [];
+                for (let i of this.alive){      //
+                    let oldPos = i.GetPos();
+                    this.grid.SetTile(oldPos.x, oldPos.y, i.controllerState.id);
+                    let newPos = i.Move();
+                    let currentTile = this.grid.GetTile(newPos.x, newPos.y);
+                    if (currentTile != 0){
+                        i.Crash();
+                        remove.push(i);
+                    }
+                    this.ctx.fillStyle = i.color;
+                    this.ctx.fillRect(i.position.x, i.position.y, 1, 1);
+                }
+
+                //Check Collision
+                for (let a of this.alive){
+                    let posA = a.GetPos();
+                    for (let b of this.alive){
+                        let posB = b.GetPos();
+                        if (a != b && posA.x == posB.x && posA.y == posB.y){
+                            if (remove.indexOf(a) == -1){
+                                remove.push(a);
+                            }
+                        }
+                    }
+                }
+
+                //Remove Dead
+                for (let rem of remove){
+                    let index = this.alive.indexOf(rem);
+                    this.alive.splice(index, 1);
+                }
+
+                //Draw Map
+                for (let i = 0; i < this.grid.width; i++){
+                    for (let j = 0; j < this.grid.height; j++){
+                        let currentTile = this.grid.GetTile(i, j);
+                        switch(currentTile){
+                            case TileTypes.Barrier:
+                                this.Draw(i, j, "#000000");
+                                break;
+                            case TileTypes.Line1:
+                                this.Draw(i, j, "#FF0000");
+                                break;
+                            case TileTypes.Line2:
+                                this.Draw(i, j, "#00FF00");
+                        }
+                    }
+                }
+
+                //Check for End Game
+                if (this.alive.length < 2){
+                    this.EndGame();
+                    this.state = 2;
+                    this.counter = 0;
+                }
+                break;
+
+            case 2:
+                this.Clear();
+                //Draw Living player (if exists)
+                
+                for (let i of this.alive){
+                    this.Draw(i.position.x, i.position.y, i.color);
+                }
+
+                //Draw Map
+                for (let i = 0; i < this.grid.width; i++){
+                    for (let j = 0; j < this.grid.height; j++){
+                        let currentTile = this.grid.GetTile(i, j);
+                        switch(currentTile){
+                            case TileTypes.Barrier:
+                                this.Draw(i, j, "#000000");
+                                break;
+                            case TileTypes.Line1:
+                                this.Draw(i, j, "#FF0000");
+                                break;
+                            case TileTypes.Line2:
+                                this.Draw(i, j, "#00FF00");
+                        }
+                    }
+                }
+
+                //Draw Winning Text
+                if (this.alive.length == 1){
+                    this.ctx.fillStyle = this.alive[0].color;
+                    this.ctx.fillText(this.alive[0].name + " Wins!", 1, 10, 50);
+                }else{
+                    this.ctx.fillStyle = "#000000";
+                    this.ctx.fillText("Draw", 1, 10, 75);
+                }
+
+                //Check reset
+                for (let i of this.players){
+                    if (i.GetPause()){
+                        this.Reset();
+                        break;
+                    }
+                }
         }
         
+        
+    }
+
+    Draw(x, y, color){
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(x, y, 1, 1);
+    }
+
+    EndGame(){
+        if (this.alive.length == 1){
+            console.log(this.alive[0].name + " Wins!");
+        }else{
+            console.log("Draw");
+        }
+    }
+
+    Reset(){
+        this.state = 0;
+        this.counter = 0;
+        this.alive = [];
+        for (let i of this.players){
+            this.alive.push(i);
+            i.Resurrect();
+        }
+        this.grid.Clear();
+        this.players[0].SetPositionDirection(new Point(5, 5), Direction.down);
+        this.players[1].SetPositionDirection(new Point(44, 44), Direction.up);
     }
 }
 
 class Player{
-    constructor(controllerState, pos, dir, color){
+    constructor(controllerState, name, id, pos, dir, color){
         this.controllerState = controllerState;
+        this.name = name;
+        this.id = id;
         this.position = pos;
         this.direction = dir;   //0 = up, 1 = down, 2 = left, 3 = right -- See Direction enum
         this.color = color;
@@ -73,14 +244,19 @@ class Player{
                     break;
             }
         }
+        return this.position;
     }
 
     Crash(){
         this.alive = false;
     }
 
+    Resurrect(){
+        this.alive = true;
+    }
+
     GetPos(){
-        return this.pos;
+        return this.position;
     }
 
     GetColor(){
@@ -89,6 +265,18 @@ class Player{
 
     Reset(pos){
         this.pos = pos;
+    }
+
+    GetPause(){
+        if (this.controllerState.buttons[4]){
+            return true;
+        }
+        return false;
+    }
+
+    SetPositionDirection(pos, dir){
+        this.position = pos;
+        this.direction = dir;
     }
 }
 
@@ -114,7 +302,7 @@ class KeyboardState{
                 for (let j = 0; j < this.data[i].keys.length; j++){
                     if (event.which == this.data[i].keys[j]){
                         this.data[i].current[j] = true;
-                        return;
+                        break;
                     }
                 }
             }
@@ -124,7 +312,7 @@ class KeyboardState{
                 for (let j = 0; j < this.data[i].keys.length; j++){
                     if (event.which == this.data[i].keys[j]){
                         this.data[i].current[j] = false;
-                        return;
+                        break;
                     }
                 }
             }
@@ -161,22 +349,32 @@ class Grid{
     constructor(width, height, numplayers){
         this.width = width;
         this.height = height;
-        this.tiles = new Tile[width][height];
-        this.spawns = new Point[numplayers];
-        for (let i = 0; i < numplayers; i++){
-            this.spawns[i] = new Point(i*5, i*5);
+        this.tiles = [];
+        this.spawns = [];
+        for (let i = 0; i < width; i++){    //Create Empty Tile Array
+            let ar = [];
+            for (let j = 0; j < height; j++){
+                ar.push(new Tile());
+                if (i == 0 || j == 0 || i == width-1 || j == height-1){
+                    ar[j].SetTile(TileTypes.Barrier);
+                }
+            }
+            this.tiles.push(ar);
+        }       
+        for (let i = 0; i < numplayers; i++){       //Create Spawns
+            this.spawns.push(new Point(0,0));
         }
     }
 
     GetTile(x, y){
-        if (x > 0 && x < this.width && y > 0 && y < this.height){
+        if (x >= 0 && x <= this.width && y >= 0 && y <= this.height){
             return this.tiles[x][y].type;
         }
-        throw new Error("Out of range - " + x + ", " + y);
+        return -1;
     }
 
     SetTile(x, y, type){
-        if (x > 0 && x < width && y > 0 && y < this.height){
+        if (x >= 0 && x <= this.width && y >= 0 && y <= this.height){
             this.tiles[x][y].type = type;
         }
     }
@@ -184,9 +382,18 @@ class Grid{
     Clear(){
         for (let i = 0; i < this.width; i++){
             for (let j = 0; j < this.height; j++){
-                this.tiles[i][j].type = TileTypes.Empty;
+                if (i == 0 || j == 0 || i == this.width-1 || j == this.height-1){
+                    this.tiles[i][j].type = TileTypes.Barrier;
+                }else{
+                    this.tiles[i][j].type = TileTypes.Empty;
+                }
+                
             }
         }
+    }
+
+    RandomPoint(){
+        return new Point(Math.floor(Math.random() * (this.width-4)) + 2, Math.random() * (this.height-4) + 2);
     }
 }
 
@@ -251,6 +458,10 @@ const KeyCode = {
     "z":90,
     "enter":13,
     "Rshift":16,
+    "ArrowLeft":37,
+    "ArrowUp":38,
+    "ArrowRight":39,
+    "ArrowDown":40
 }
 
 class Point{
@@ -270,18 +481,22 @@ class Triple{
 
 function Setup(){
     console.log("Starting up...");
-    let game = new Game(document.getElementById("canvas"));
+    let game = new Game(document.getElementById("canvas"), 50, 50, 2);
     game.Clear();
     console.log("DONE!");
     let t = new Tile();
     t.type = TileTypes.Line1;
     let ks = new KeyboardState();
-    let cs = new ControllerState(ks, "player1", KeyCode.w, KeyCode.s, KeyCode.a, KeyCode.d, KeyCode.enter);
-    let p = new Player(cs, new Point(25, 25), 0, "red");
+    let cs = new ControllerState(ks, TileTypes.Line1, KeyCode.w, KeyCode.s, KeyCode.a, KeyCode.d, KeyCode.enter);
+    let p = new Player(cs, "Player1", TileTypes.Line1, new Point(5, 5), 1, "#CC0000");
+    let cs2 = new ControllerState(ks, TileTypes.Line2, KeyCode.ArrowUp, KeyCode.ArrowDown, KeyCode.ArrowLeft, KeyCode.ArrowRight, KeyCode.Rshift);
+    let p2 = new Player(cs2, "Player2", TileTypes.Line2, new Point(44, 44), Direction.up, "#00CC00");
     game.AddPlayer(p);
+    game.AddPlayer(p2);
     let timer = setInterval(_=>{
         game.Tick();
-    }, 50);
+    }, 70);
+    game.grid.SetTile(1, 0, TileTypes.Barrier);
 }
 
 document.addEventListener("DOMContentLoaded", Setup);
