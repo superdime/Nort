@@ -19,7 +19,14 @@ The purpose of this file is to explain diagrams and design decisions. This is do
         - KeyCode
         - KeyboardState
         - Triple
-- ...
+- Nort Class Diagram JS (fully suited for HTML Canvas)
+    - Design Decisions
+        - Game
+        - Grid
+        - Player
+        - ControllerState
+        - KeyboardState
+        - Direction
 
 
 ## Old Nort Class Diagram
@@ -70,4 +77,24 @@ This is a highly event driven class. It will check keys given and pass their boo
 #### Triple
 This class was made for KeyboardState. I wanted a simple container that holds an id, keys to be checked, and their current values. This is what helps the ControllerState and KeyboardState communicate effectively.
 
-## ...
+## Nort Class Diagram JS
+This was about making sure the game was functional with respect to the Diagram. Some functions were unnecessary and some others were required when an obvious gap in logic was found. Overall, the implementation reflects the design now and it functions properly under this design (as far as I have made it correctly).
+
+### Design Decisions
+#### Game
+There was a need for Game states to be added (ex: there needs to be a countdown state, playing state, and show-winner state). For the countdown state, a counter to accurately countdown time was needed as well. I added Game.DrawPixel() to reduce code (two function calls for every pixel creation was a little irritating). The pause feature was abandoned assuming that games were short enough not to require it (it can be added later fairly easily if required). The Game.RemovePlayer() feature was removed because it is not likley to be used if a GameSettings interface is to be used (only adding and removing all seem necessary).
+
+#### Grid
+Added Grid.RandomPoint() to generate random spawns. It may be better in the future to use circle-like placement of spawns though. (for fairness)
+
+#### Player
+There were a lot of changes here. An id(tiletype) for easy tiletype assignment and name to show at the winning screen were necessary. I removed Player.alive and Player.Crash() because the game never really used them in a meaningful way. A player's alive status can already be determined by Game.alive[]. The set and get positions were changed because having position public in JS is just easier to access and use. The SetPosition()/Oriention() were added for convenience.
+
+#### ControllerState
+ControllerState.active was removed because it was not necessary. The class only changes when the Player is alive.
+
+#### KeyboardState
+KeyboardState.keyboard was removed because there is no keyboard object to access in a HTML Canvas environment. (This may change when accessing controllers - if multiple keyboards exist for this environment).
+
+#### Direction
+Direction.none was added so that players could choose which direction to start at with. (If the starting direction is down and you want to go up, then the game would not allow you to go where you wanted to begin with). Part of this decision is based on the decision to have 4 direction input unlike other Tron-like games which have 2 direction input.
