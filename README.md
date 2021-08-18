@@ -10,3 +10,8 @@ This is mainly used to help me learn how design influences coding. Overall, I ho
 
 ## Play Game
 [Play Game](http://htmlpreview.github.io/?https://github.com/superdime/Nort/blob/master/Game/index.html)
+
+### How to Play (Current)
+Player 1 (Red) has WASD input
+Player 2 (Green) has Arrow key input
+Refresh page to play again (NEEDS FIX)
