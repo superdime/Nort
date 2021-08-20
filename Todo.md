@@ -1,9 +1,9 @@
 ### Current Cycle
-- Begin new Cycle
+- Add Color module to Game
+- Fix unlikely (still happens) collision miss
+- Change TileType system to use Colors instead
 
 ### Later
-- Color System
-    - Color combine on crash
 - Text System / Better font
 - GameSettings UI
 - Gamepads
