@@ -6,6 +6,7 @@ This is mainly used to help me learn how design influences coding. Overall, I ho
 
 ## Structure
 - Design Folder - Holds Design information such as diagrams and decisions.
+- Testing Folder - Holds a Unit Testing webpage.
 - Game Folder - Holds the game.
 
 ## Play Game
