@@ -1,7 +1,8 @@
 ### Current Cycle
 - Privatize variables
 - Update Diagram
-- Start next cycle
+- GameSettings UI
+    - 
 
 ### Later
 - GameSettings UI
@@ -13,7 +14,5 @@
 - AI
 
 ### Done
-- Game.DrawMap is now a function
-- Color module added
-- Fixed collision with Collision class
-- Player collision color splash added
+- Created Basic UI for setup
+- Added Color.Random()

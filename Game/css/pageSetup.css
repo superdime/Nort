@@ -1,0 +1,205 @@
+* {
+    image-rendering: pixelated;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin:0;
+    image-rendering: crisp-edges;
+}
+
+main{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.playerList{
+    width: 100%;
+    height:60%;
+    position: relative;
+    left: 0px;
+    top: 0px;
+    background-color: red;
+    vertical-align: middle;
+    overflow-y: hidden;
+    white-space: nowrap;
+    
+}
+
+.map{
+    width: 100%;
+    height: 40%;
+    position: absolute;
+    top:60%;
+    left: 0px;
+    background-color: blue;
+}
+
+.player{
+    height: 90%;
+    width: 22%;
+    margin: auto;
+    background-color: black;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 1.25%;
+    position: relative;
+    display: inline-flex;
+    vertical-align: top;
+    flex-direction: column;
+}
+
+#addPlayer{
+    height: 90%;
+    width: 22%;
+    margin: auto;
+    background-color: black;
+    color: white;
+    font-size: 1000%;
+    text-align: center;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 1.25%;
+    position: relative;
+    display: inline-flex;
+    vertical-align: top;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.name {
+    color:white;
+    position:relative;
+    margin:auto;
+    width: 90%;
+}
+
+.item {
+    width: 100%;
+    max-height: 20%;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    flex-flow: row;
+    margin:auto;
+    text-align: left;
+    text-indent: 5%;
+    color:white;
+}
+
+.table {
+    width: 50%;
+    height: 100%;
+    right: 0px;
+    display: grid;
+    background-color: gray;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.grid-button{
+    background-color: red;
+    width: 100%;
+    margin: 0px;
+    border: 0px;
+}
+
+.grid-button:hover{
+    background-color: darkred;
+}
+
+.grid-button:active{
+    background-color: darkorange;
+}
+
+.grid-1{
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.grid-2{
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.grid-3{
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.grid-4{
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.grid-5{
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.grid-6{
+    grid-column: 3;
+    grid-row: 2;
+}
+
+p {
+    width: 60%;
+    margin-left: 10%;
+}
+
+button {
+    margin: auto;
+    margin-right: 10%;
+    width: 30%;
+}
+
+input {
+    width: 60%;
+    margin: auto;
+    margin-right: 5%;
+    justify-content: center;
+    float: left;
+}
+
+.color {
+    width: 40%;
+    height: 100%;
+    position: relative;
+    margin:auto;
+    margin-left:5%;
+}
+
+.map {
+    display: flex;
+    flex-direction: column;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+#popup {
+    display: none;
+    width:100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 50);
+    left: 0px;
+    position: absolute;
+}
+
+.poptext{
+    width:50%;
+    height: 50%;
+    left: 25%;
+    top: 25%;
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    background-color: lightgray;
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nort Page Setup</title>
+    <script src="./js/Game.js"></script>
+    <script src="./js/PageSetup.js"></script>
+    <link rel="stylesheet" href="./css/pageSetup.css">
+</head>
+<body>
+    <main><!--Content Holder-->
+        <div id="playerList" class="playerList"><!--Players-->
+            <div class="player" id="Player 0">
+                <div class="item">
+                    Name: <input id="0-Name" type="text" maxlength="8" value="P0">
+                </div>
+                <div class="item">
+                    Main Color: <input type="color" id="0-MainColor" class="color">
+                </div>
+                <div class="item">
+                    Alt Color: <input type="color" id="0-AltColor" class="color">
+                </div>
+                <div class="item">
+                    Controls: <div class="table">
+                        <button id="0-Up" value="87" class="grid-2 grid-button">W</button>
+                        <button id="0-Left" value="65" class="grid-4 grid-button">A</button>
+                        <button id="0-Down" value="83" class="grid-5 grid-button">S</button>
+                        <button id="0-Right" value="68" class="grid-6 grid-button">D</button>
+                    </div>
+                </div>
+            </div>
+            <div class="player" id="Player 1">
+                <div class="item">
+                    Name: <input id="1-Name" maxlength="8" type="text" value="P1">
+                </div>
+                <div class="item">
+                    Main Color: <input type="color" id="1-MainColor" class="color">
+                </div>
+                <div class="item">
+                    Alt Color: <input type="color" id="1-AltColor" class="color">
+                </div>
+                <div class="item">
+                    Controls: <div class="table">
+                        <button id="1-Up" value="38" class="grid-2 grid-button">^</button>
+                        <button id="1-Left" value="37" class="grid-4 grid-button"><-</button>
+                        <button id="1-Down" value="40" class="grid-5 grid-button">V</button>
+                        <button id="1-Right" value="39" class="grid-6 grid-button">-></button>
+                    </div>
+                </div>
+            </div>
+            <div id="addPlayer">
+                +
+            </div>
+        </div>
+        <div class="map"><!--Map-->
+            <div class="item">
+                Resolution: <input id="resX" value="1920" type="number"> <input id="resY" value="1080" type="number">
+                Size: <input id="x" value="100" min="10" type="number"> <input id="y" value="100" min="10" type="number">
+            </div>
+            <button id="create">Create Game</button>
+        </div>
+    </main>
+    <div id="popup">
+        <div class="poptext">
+            Please press a button
+        </div>
+    </div>
+</body>
+</html>
