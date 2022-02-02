@@ -11,6 +11,7 @@ This is mainly used to help me learn how design influences coding. Overall, I ho
 
 ## Play Game
 [Play Game (Quick Play - Can look clunky - fixed resolution)](http://htmlpreview.github.io/?https://github.com/superdime/Nort/blob/master/Game/index.html)
+
 [Play Game via Setup](http://htmlpreview.github.io/?https://github.com/superdime/Nort/blob/master/Game/pageSetup.html)
 
 ### How to Play (Current)
